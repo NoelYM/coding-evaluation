@@ -19,11 +19,28 @@ public abstract class Organization {
 	 * @param title
 	 * @return the newly filled position or empty if no position has that title
 	 */
-	public Optional<Position> hire(Name person, String title) {
-		//your code here
+	public Optional<Position> checkPos (Position pos, String title) {
+		Optional<Position> posMatch = Optional.of(pos);
+		// check if positions match
+		if (posMatch.get().getTitle().equalsIgnoreCase(title)) return posMatch;
+		else {
+
+			for (Position p : pos.getDirectReports()) {
+				posMatch = checkPos(p, title);
+				if (posMatch.isPresent()) return posMatch;
+			}
+		}
+
 		return Optional.empty();
 	}
 
+	public void hire (Name person, String title) {
+		Optional<Position> position = checkPos(root, title);
+		Random rand = new Random();
+		int employeeId = rand.nextInt(20);
+		// if the position exists, then assign the employee to the position
+		position.ifPresent(value -> value.setEmployee(Optional.of(new Employee(employeeId, person))));
+	}
 	@Override
 	public String toString() {
 		return printOrganization(root, "");
